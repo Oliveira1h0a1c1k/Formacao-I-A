@@ -3,12 +3,19 @@ document.getElementById('inscricao-form').addEventListener('submit', function(ev
 
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
+    const telefone = document.getElementById('telefone').value;
     const linguagem = document.getElementById('linguagem').value;
 
-    if (!nome || !email || !linguagem) {
+    if (!nome || !email || !telefone || !linguagem) {
         alert('Por favor, preencha todos os campos.');
         return;
     }
+
+    const mensagemParaVoce = `Nova inscrição:\nNome: ${nome}\nEmail: ${email}\nTelefone: ${telefone}\nLinguagem: ${linguagem}`;
+    const numeroWhatsAppDono = '244936705605';
+    const linkWhatsAppDono = `https://wa.me/${numeroWhatsAppDono}?text=${encodeURIComponent(mensagemParaVoce)}`;
+
+    window.open(linkWhatsAppDono, '_blank');
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
@@ -36,17 +43,18 @@ document.getElementById('inscricao-form').addEventListener('submit', function(ev
     doc.setTextColor(50, 50, 50);
     doc.text(`Nome: ${nome}`, 20, 60);
     doc.text(`Email: ${email}`, 20, 70);
-    doc.text(`Linguagem Escolhida: ${linguagem}`, 20, 80);
+    doc.text(`Telefone: ${telefone}`, 20, 80);
+    doc.text(`Linguagem Escolhida: ${linguagem}`, 20, 90);
 
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text("Formador: João de Oliveira O. Txipamba", 20, 100);
+    doc.text("Formador: João de Oliveira O. Txipamba", 20, 110);
 
     doc.setFontSize(12);
     doc.setTextColor(255, 0, 0);
     const ibanText = "IBAN para Pagamento: 0040.0000.7307.3375.1015.4";
-    doc.text("Destinatário: João de Oliveira O. Txipamba", 20, 100);
-    doc.text(ibanText, 20, 120, { maxWidth: 170 });
+    doc.text("Destinatário: João de Oliveira O. Txipamba", 20, 120);
+    doc.text(ibanText, 20, 140, { maxWidth: 170 });
 
     doc.setFillColor(40, 167, 69);
     doc.rect(0, doc.internal.pageSize.getHeight() - 20, pageWidth, 20, 'F');
@@ -55,7 +63,7 @@ document.getElementById('inscricao-form').addEventListener('submit', function(ev
     doc.text("Obrigado por se inscrever!", center, doc.internal.pageSize.getHeight() - 10, { align: "center" });
 
     doc.save('comprovativo-inscricao.pdf');
-    alert('Inscrição realizada com sucesso! Seu comprovativo foi baixado.');
+    alert('Inscrição realizada com sucesso! Seu comprovativo foi baixado e você será notificado no WhatsApp.');
     document.getElementById('inscricao-form').reset();
 });
 
