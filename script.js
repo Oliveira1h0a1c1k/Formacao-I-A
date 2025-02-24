@@ -6,17 +6,19 @@ document.getElementById('inscricao-form').addEventListener('submit', function(ev
     const telefone = document.getElementById('telefone').value;
     const linguagem = document.getElementById('linguagem').value;
 
-    if (!nome || !email || !telefone || !linguagem) {
-        alert('Por favor, preencha todos os campos.');
+    // Validação do telefone (deve começar com 9 e ter 9 dígitos)
+    const telefoneRegex = /^[9][0-9]{8}$/;
+    if (!telefone || !telefoneRegex.test(telefone)) {
+        alert('Por favor, insira um número de telefone válido começando com 9 e com 9 dígitos (ex.: 936705605).');
         return;
     }
 
-    const mensagemParaVoce = `Nova inscrição:\nNome: ${nome}\nEmail: ${email}\nTelefone: ${telefone}\nLinguagem: ${linguagem}`;
-    const numeroWhatsAppDono = '244936705605';
-    const linkWhatsAppDono = `https://wa.me/${numeroWhatsAppDono}?text=${encodeURIComponent(mensagemParaVoce)}`;
+    if (!nome || !email || !linguagem) {
+        alert('Por favor, preencha todos os campos (exceto telefone, que já foi validado).');
+        return;
+    }
 
-    window.open(linkWhatsAppDono, '_blank');
-
+    // Gerar o PDF
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
@@ -62,9 +64,25 @@ document.getElementById('inscricao-form').addEventListener('submit', function(ev
     doc.setFontSize(10);
     doc.text("Obrigado por se inscrever!", center, doc.internal.pageSize.getHeight() - 10, { align: "center" });
 
+    // Salvar o PDF temporariamente no cliente e criar um URL blob para compartilhar
+    const pdfBlob = doc.output('blob');
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+
+    // Notificação no WhatsApp com link para o PDF
+    const mensagemParaVoce = `Nova inscrição!\nNome: ${nome}\nEmail: ${email}\nTelefone: ${telefone}\nLinguagem: ${linguagem}\nBaixe o comprovativo aqui: ${pdfUrl}`;
+    const numeroWhatsAppDono = '244936705605';
+    const linkWhatsAppDono = `https://wa.me/${numeroWhatsAppDono}?text=${encodeURIComponent(mensagemParaVoce)}`;
+
+    // Abrir o WhatsApp em uma nova aba
+    window.open(linkWhatsAppDono, '_blank');
+
+    // Forçar o download do PDF para o inscrito
     doc.save('comprovativo-inscricao.pdf');
-    alert('Inscrição realizada com sucesso! Seu comprovativo foi baixado e você será notificado no WhatsApp.');
+    alert('Inscrição realizada com sucesso! Seu comprovativo foi baixado e você será notificado no WhatsApp com o link para o documento.');
     document.getElementById('inscricao-form').reset();
+
+    // Limpar o URL do blob após o uso para evitar memory leaks
+    URL.revokeObjectURL(pdfUrl);
 });
 
 document.querySelectorAll('.nav-link').forEach(link => {
